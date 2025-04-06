@@ -92,5 +92,14 @@ void app_main(void) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         draw_diagonal_rainbow_lut(m_framebuffer, 480, 480, frame, 3);
         frame++;
+
+        // // poll for touch events and handle them in here
+        // esp_lcd_touch_read_data(g_lcd_touch_handle);
+        // uint16_t touch_x[5];
+        // uint16_t touch_y[5];
+        // uint16_t touch_strength[5];
+        // uint8_t touch_cnt = 0;
+        // bool touchpad_pressed = esp_lcd_touch_get_coordinates(g_lcd_touch_handle, touch_x, touch_y, touch_strength, &touch_cnt, 5);
+
     }
 }
