@@ -53,7 +53,7 @@ static const st7701_lcd_init_cmd_t m_st7701_type1_init_operations[] = {
     { 0x20,(uint8_t[]){ }, 0x0, 150 },
 };
 
-static void lcd_panel_init_panel(void) {
+void lcd_panel_init_panel(void) {
     //
     // Setup the io bus, we are going to bit-bang the SPI bus
     //
@@ -131,7 +131,7 @@ static void lcd_panel_init_panel(void) {
     ESP_ERROR_CHECK(gpio_set_level(38, 1));
 }
 
-static void lcd_panel_init_touch(void) {
+void lcd_panel_init_touch(void) {
     //
     // Setup the i2c bus for the touch controller
     //
@@ -176,9 +176,4 @@ static void lcd_panel_init_touch(void) {
         .driver_data = &tp_gt911_config,
     };
     ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_gt911(io_handle, &tp_cfg, &g_lcd_touch_handle));
-}
-
-void lcd_panel_init(void) {
-    lcd_panel_init_panel();
-    lcd_panel_init_touch();
 }
