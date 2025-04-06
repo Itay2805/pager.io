@@ -75,7 +75,22 @@ void lcd_panel_init(void) {
             8, 20, 3, 46, 9, 10,
             11, 12, 13, 14, 0
         },
-        .timings = ST7701_480_480_PANEL_60HZ_RGB_TIMING(),
+        .timings = {
+            .pclk_hz = 16 * 1000 * 1000,
+            .h_res = 480,
+            .v_res = 480,
+            .hsync_front_porch = 10,
+            .hsync_pulse_width = 8,
+            .hsync_back_porch = 50,
+            .vsync_front_porch = 10,
+            .vsync_pulse_width = 8,
+            .vsync_back_porch = 20,
+            .flags = {
+                .hsync_idle_low = 0,
+                .vsync_idle_low = 0,
+                .pclk_active_neg = 0,
+            }
+        },
         .bounce_buffer_size_px = 480 * 16,
         .flags.fb_in_psram = 1,
     };
