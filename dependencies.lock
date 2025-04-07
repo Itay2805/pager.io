@@ -81,7 +81,7 @@ dependencies:
   idf:
     source:
       type: idf
-    version: 5.5.0
+    version: 5.4.1
 direct_dependencies:
 - espressif/esp_lcd_panel_io_additions
 - espressif/esp_lcd_st7701
