@@ -2,10 +2,23 @@
 #include <esp_lcd_panel_ops.h>
 #include <esp_lcd_panel_rgb.h>
 #include <math.h>
+#include <notifications.h>
+#include <nvs_flash.h>
 #include <stdint.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <rom/cache.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <nimble/nimble_port.h>
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_log.h"
+#include "sdkconfig.h"
 
 #include "lcd_panel.h"
 
@@ -176,27 +189,32 @@ static void render_task_main(void* arg) {
     }
 }
 
-
 void app_main(void) {
+    // Setup the NVS, BLE needs it
+    ESP_ERROR_CHECK(nvs_flash_init());
+
+    //
     // Create a max priority task on the second core, task
     // will be in charge of rendering to allow the main core
     // to run an event loop
-    TaskHandle_t render_task;
-    if (xTaskCreatePinnedToCore(
+    //
+    xTaskCreatePinnedToCore(
         render_task_main,
         "render_task",
         3584,
         NULL,
         configMAX_PRIORITIES - 1,
-        &render_task,
+        NULL,
         1
-    ) != pdPASS) {
-        printf("Failed to create render task!\n");
-        return;
-    }
+    );
 
     //
-    // Handle input
+    // Setup notifications service
+    //
+    init_notifications();
+
+    //
+    // Main app stuff
     //
 
     lcd_panel_init_touch();
