@@ -1,4 +1,6 @@
-idf_component_register(SRCS "main.c" "lcd_panel.c" "notifications.c"
+file(GLOB_RECURSE SOURCES *.h *.c)
+
+idf_component_register(SRCS ${SOURCES}
                     PRIV_REQUIRES esp_lcd_st7701
                     PRIV_REQUIRES esp_lcd_touch_gt911
                     PRIV_REQUIRES esp_lcd_panel_io_additions

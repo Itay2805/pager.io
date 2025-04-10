@@ -10,9 +10,9 @@
 #include <driver/i2c.h>
 #include <driver/i2c_master.h>
 
-esp_lcd_panel_handle_t g_lcd_panel_handle;
-esp_lcd_touch_handle_t g_lcd_touch_handle;
-
+/**
+ * Copied from the demo files for the ESP32-XXXXXX board
+ */
 static const st7701_lcd_init_cmd_t m_st7701_type1_init_operations[] = {
     { 0xFF,(uint8_t[]){ 0x77,0x01,0x00,0x00,0x10 }, 0x5, 0 },
     { 0xC0,(uint8_t[]){ 0x3B,0x00 }, 0x2, 0 },
@@ -53,7 +53,7 @@ static const st7701_lcd_init_cmd_t m_st7701_type1_init_operations[] = {
     { 0x20,(uint8_t[]){ }, 0x0, 150 },
 };
 
-void lcd_panel_init_panel(void) {
+esp_lcd_panel_handle_t lcd_panel_init_panel(void) {
     //
     // Setup the io bus, we are going to bit-bang the SPI bus
     //
@@ -116,9 +116,11 @@ void lcd_panel_init_panel(void) {
         .bits_per_pixel = 16,
         .vendor_config = &vendor_config,
     };
-    ESP_ERROR_CHECK(esp_lcd_new_panel_st7701(io_handle, &panel_config, &g_lcd_panel_handle));
-    ESP_ERROR_CHECK(esp_lcd_panel_reset(g_lcd_panel_handle));
-    ESP_ERROR_CHECK(esp_lcd_panel_init(g_lcd_panel_handle));
+
+    esp_lcd_panel_handle_t handle = NULL;
+    ESP_ERROR_CHECK(esp_lcd_new_panel_st7701(io_handle, &panel_config, &handle));
+    ESP_ERROR_CHECK(esp_lcd_panel_reset(handle));
+    ESP_ERROR_CHECK(esp_lcd_panel_init(handle));
 
     //
     // Turn on the backlight
@@ -129,9 +131,11 @@ void lcd_panel_init_panel(void) {
     };
     ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
     ESP_ERROR_CHECK(gpio_set_level(38, 1));
+
+    return handle;
 }
 
-void lcd_panel_init_touch(void) {
+esp_lcd_touch_handle_t lcd_panel_init_touch(void) {
     //
     // Setup the i2c bus for the touch controller
     //
@@ -175,5 +179,9 @@ void lcd_panel_init_touch(void) {
         },
         .driver_data = &tp_gt911_config,
     };
-    ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_gt911(io_handle, &tp_cfg, &g_lcd_touch_handle));
+
+    esp_lcd_touch_handle_t handle = NULL;
+    ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_gt911(io_handle, &tp_cfg, &handle));
+
+    return handle;
 }
