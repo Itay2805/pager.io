@@ -23,13 +23,19 @@ static void ble_advertise(void);
  * Handle am event related to the connection
  */
 static int ble_gap_event(struct ble_gap_event* event, void *arg) {
-    // TODO: when a disconnect happens start advertizing again
-
     switch (event->type) {
-        default: {
-            ESP_LOGW(TAG, "Unknown GAP event %d", event->type);
+        case BLE_GAP_EVENT_LINK_ESTAB: {
+            // TODO: start a timer for the connect message to be sent,
+            //       if not sent in time then force disconnect the client
+        } break;
+
+        case BLE_GAP_EVENT_DISCONNECT: {
+            // the client disconnected, so restart
+            // the advertising
+            ble_advertise();
         } break;
     }
+
     return 0;
 }
 
@@ -37,7 +43,8 @@ static int ble_gap_event(struct ble_gap_event* event, void *arg) {
  * Advertise that we exist
  */
 static void ble_advertise(void) {
-    // TODO: once paired maybe do a direct advertising
+    // TODO: once paired do a direct advertising
+    //       and set a whitelist for the client
 
     struct ble_gap_adv_params adv_params = {
         .conn_mode = BLE_GAP_CONN_MODE_UND,
@@ -50,6 +57,15 @@ static void ble_advertise(void) {
  * Called once the stack is ready, just start the advertizing
  */
 static void ble_on_sync(void) {
+    // set the advertisement fields
+    struct ble_hs_adv_fields fields = {
+        .name = (uint8_t*)"pager.io",
+        .name_len = strlen("pager.io"),
+        .name_is_complete = 1
+    };
+    ble_gap_adv_set_fields(&fields);
+
+    // and perform a first advertisement
     ble_advertise();
 }
 
@@ -58,6 +74,10 @@ static int gatt_svr_chr_access_cb(uint16_t conn_handle, uint16_t attr_handle, st
     switch (ctxt->op) {
         case BLE_GATT_ACCESS_OP_WRITE_CHR: {
             // TODO: handle a new message
+            //       if message authentication fails force disconnect
+            //       if we are in binding mode only accept a bind request
+            //       right after a connection a connect message should be sent
+            //       to ensure we setup the connection
         } return 0;
 
         case BLE_GATT_ACCESS_OP_READ_CHR: {
@@ -111,5 +131,4 @@ void init_ble(void) {
 
     // And run the freertos thread properly
     nimble_port_freertos_init(ble_host_task);
-
 }
