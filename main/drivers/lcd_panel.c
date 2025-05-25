@@ -9,6 +9,7 @@
 #include <driver/gpio.h>
 #include <driver/i2c.h>
 #include <driver/i2c_master.h>
+#include "lcd_panel.h"
 
 /**
  * Copied from the demo files for the ESP32-XXXXXX board
@@ -88,8 +89,8 @@ esp_lcd_panel_handle_t lcd_panel_init_panel(void) {
         },
         .timings = {
             .pclk_hz = 16 * 1000 * 1000,
-            .h_res = 480,
-            .v_res = 480,
+            .h_res = LCD_WIDTH,
+            .v_res = LCD_HEIGHT,
             .hsync_front_porch = 10,
             .hsync_pulse_width = 8,
             .hsync_back_porch = 50,
@@ -102,7 +103,7 @@ esp_lcd_panel_handle_t lcd_panel_init_panel(void) {
                 .pclk_active_neg = 0,
             }
         },
-        .bounce_buffer_size_px = 480 * 16,
+        .bounce_buffer_size_px = LCD_WIDTH * 16,
         .flags.fb_in_psram = 1,
     };
     st7701_vendor_config_t vendor_config = {
@@ -164,8 +165,8 @@ esp_lcd_touch_handle_t lcd_panel_init_touch(void) {
         .dev_addr = io_config.dev_addr,
     };
     esp_lcd_touch_config_t tp_cfg = {
-        .x_max = 480,
-        .y_max = 480,
+        .x_max = LCD_WIDTH,
+        .y_max = LCD_HEIGHT,
         .rst_gpio_num = -1,
         .int_gpio_num = -1,
         .levels = {

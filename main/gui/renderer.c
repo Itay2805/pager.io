@@ -7,6 +7,10 @@
 
 #include <drivers/lcd_panel.h>
 
+// TODO: move to `scrolling.h`
+extern float scroll_pos;
+
+
 /**
  * Called wehenever the frame buffer DMA is finished, this lets us know we can now start working on
  * processing the next frame
@@ -15,6 +19,19 @@ static bool on_frame_buf_complete(esp_lcd_panel_handle_t panel, const esp_lcd_rg
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     vTaskNotifyGiveFromISR(user_ctx, &xHigherPriorityTaskWoken);
     return xHigherPriorityTaskWoken;
+}
+
+void render_rect_row(uint32_t* framebuffer_row, uint16_t color, uint16_t x0, uint16_t x1) {
+    const uint32_t color_pair = (color << 16) | color;
+    if (x0 % 2 == 1) {
+        ((uint16_t*)framebuffer_row)[x0] = color;
+    }
+    for (int x = x0/2; x < x1/2; x++) {
+        framebuffer_row[x] = color_pair;
+    }
+    if (x1 % 2 == 1) {
+        ((uint16_t*)framebuffer_row)[x1-1] = color;
+    }
 }
 
 static void renderer_task(void* arg) {
@@ -48,6 +65,21 @@ static void renderer_task(void* arg) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
         // TODO: perform whatever the renderer should do in here
+        for (int y = 0; y < LCD_HEIGHT; y++) {
+            uint32_t* fb_row = (uint32_t*)framebuffer + y * (LCD_WIDTH / 2);
+
+            // Display a repeating list of rectangles, reacting to the scroll_pos
+            const float one_over_256 = 0.00390625f; // Mult much faster than div
+            // Float remainder. Can maybe use `remainderf`
+            int16_t scroll_y = (int16_t)(scroll_pos - (float)((int32_t)(scroll_pos * one_over_256) * 256));
+            if (scroll_y < 0) scroll_y = (int16_t) (scroll_y + 256);
+
+            int adj_y = (y - scroll_y) % 256;
+            if (adj_y < 0) adj_y = 256 + adj_y;
+
+            const uint16_t color = adj_y > 200 ? 0xfafa : 0x0;
+            render_rect_row(fb_row, color, 128,  LCD_WIDTH - 128);
+        }
     }
 }
 

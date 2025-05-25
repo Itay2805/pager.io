@@ -3,5 +3,8 @@
 #include <esp_lcd_touch.h>
 #include <esp_lcd_types.h>
 
+#define LCD_WIDTH 480
+#define LCD_HEIGHT 480
+
 esp_lcd_panel_handle_t lcd_panel_init_panel(void);
 esp_lcd_touch_handle_t lcd_panel_init_touch(void);
