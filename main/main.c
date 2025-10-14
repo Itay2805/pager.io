@@ -7,7 +7,7 @@
 #include "protocol/ble.h"
 
 /// The current scroll position
-float scroll_pos = 0;
+float scroll_pos = 150.f;
 
 static void input_task() {
     // TODO: should we move to our own init code? need to check if the touch
@@ -43,13 +43,34 @@ static void input_task() {
                 fvelocity = (float) (int32_t) velocity;
             } else if (fvelocity != 0) {
                 // Apply drag to velocity. Eventually stop to save compute.
-                fvelocity = fvelocity * 0.95f;
+                fvelocity *= 0.92f;
                 if (fvelocity < 0.2 && fvelocity > -0.2) {
                     fvelocity = 0;
                 }
             }
             // Scroll according to current velocity
             scroll_pos += fvelocity;
+
+            // Restrict scroll area with rubber-banding
+            if (scroll_pos < 0) {
+                scroll_pos -= scroll_pos * 0.25f;
+                if (scroll_pos >= -0.2) {
+                    scroll_pos = 0;
+                }
+                if (fvelocity < 0) {
+                    fvelocity *= 0.8f; // Apply drag faster when out of bounds
+                }
+            }
+            float scroll_end = LCD_HEIGHT - 169;
+            if (scroll_pos > scroll_end) {
+                scroll_pos -= (scroll_pos - scroll_end) * 0.25f;
+                if (scroll_pos <= scroll_end + 0.2) {
+                    scroll_pos = scroll_end;
+                }
+                if (fvelocity > 0) {
+                    fvelocity *= 0.8f; // Apply drag faster when out of bounds
+                }
+            }
         }
 
         last_pressed = touchpad_pressed;
