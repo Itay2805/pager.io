@@ -3,3 +3,4 @@ sdkconfig.old
 .idea
 cmake-build-debug
 managed_components/
+sdkconfig

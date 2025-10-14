@@ -78,11 +78,14 @@ static int gatt_svr_chr_access_cb(uint16_t conn_handle, uint16_t attr_handle, st
             //       if we are in binding mode only accept a bind request
             //       right after a connection a connect message should be sent
             //       to ensure we setup the connection
+            ESP_LOGI("pager", "Got message: %.*s", ctxt->om->om_len, ctxt->om->om_data);
         } return 0;
 
         case BLE_GATT_ACCESS_OP_READ_CHR: {
             // TODO: return the status
-        } return 0;
+            int rc = os_mbuf_append(ctxt->om, "LOL", 3);
+            return rc;
+        }
 
         default:
             return BLE_ATT_ERR_UNLIKELY;

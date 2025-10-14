@@ -25,14 +25,14 @@ dependencies:
     - name: idf
       require: private
       version: '>=4.4.2'
-    - name: espressif/esp_io_expander
-      registry_url: https://components.espressif.com
-      require: public
-      version: ^1
     - name: espressif/cmake_utilities
       registry_url: https://components.espressif.com
       require: private
       version: 0.*
+    - name: espressif/esp_io_expander
+      registry_url: https://components.espressif.com
+      require: public
+      version: ^1
     source:
       registry_url: https://components.espressif.com/
       type: service
@@ -81,12 +81,12 @@ dependencies:
   idf:
     source:
       type: idf
-    version: 5.4.1
+    version: 6.0.0
 direct_dependencies:
 - espressif/esp_lcd_panel_io_additions
 - espressif/esp_lcd_st7701
 - espressif/esp_lcd_touch_gt911
 - idf
-manifest_hash: 9ba3b0b061da69c1c2641b743e215a3ea31be585c85a03388fe10dcc96653688
+manifest_hash: 33fcdb1aa3810d6efa67ae0a896dc5726ca4369c39373fa6679e7c77a0402b78
 target: esp32s3
 version: 2.0.0

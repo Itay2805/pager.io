@@ -7,7 +7,7 @@
 #include <esp_lcd_st7701.h>
 #include <esp_lcd_touch_gt911.h>
 #include <driver/gpio.h>
-#include <driver/i2c.h>
+// #include <driver/i2c.h>
 #include <driver/i2c_master.h>
 
 /**
@@ -139,23 +139,23 @@ esp_lcd_touch_handle_t lcd_panel_init_touch(void) {
     //
     // Setup the i2c bus for the touch controller
     //
-    i2c_config_t conf = {
-        .mode = I2C_MODE_MASTER,
-        .scl_io_num = 45,
+    i2c_master_bus_config_t conf = {
+        .i2c_port = -1,
         .sda_io_num = 19,
-        .master = {
-            .clk_speed = 100 * 1000
-        }
+        .scl_io_num = 45,
+        .clk_source = I2C_CLK_SRC_DEFAULT,
+        .glitch_ignore_cnt = 7,
     };
-    ESP_ERROR_CHECK(i2c_param_config(I2C_NUM_0, &conf));
-    ESP_ERROR_CHECK(i2c_driver_install(I2C_NUM_0, conf.mode, 0, 0, 0));
+    i2c_master_bus_handle_t bus_handle;
+    ESP_ERROR_CHECK(i2c_new_master_bus(&conf, &bus_handle));
 
     //
     // Create an IO handle for the i2c bus
     //
     esp_lcd_panel_io_handle_t io_handle = NULL;
     esp_lcd_panel_io_i2c_config_t io_config = ESP_LCD_TOUCH_IO_I2C_GT911_CONFIG();
-    ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c(I2C_NUM_0, &io_config, &io_handle));
+    io_config.scl_speed_hz = 100 * 1000;
+    ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c(bus_handle, &io_config, &io_handle));
 
     //
     // Configure the GT911 touch controller
